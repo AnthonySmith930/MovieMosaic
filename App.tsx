@@ -1,10 +1,3 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
 import React from 'react';
 import type {PropsWithChildren} from 'react';
 import {
@@ -14,7 +7,7 @@ import {
   StyleSheet,
   Text,
   useColorScheme,
-  View,
+  View
 } from 'react-native';
 
 import {
@@ -24,6 +17,8 @@ import {
   LearnMoreLinks,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
+
+import { useGetDiscoverListQuery, DiscoverList, DiscoverListItem } from './src/redux/api/apiSlice';
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -62,6 +57,28 @@ function App(): React.JSX.Element {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
+  const {
+    data: DiscoveryData = {} as DiscoverList,
+    isLoading,
+    isSuccess,
+    isError,
+    error
+  } = useGetDiscoverListQuery()
+
+  const { results } = DiscoveryData
+
+  let content: React.ReactNode
+
+  if (isLoading) {
+    console.log("loading...")
+  } else if (isSuccess) {
+    // content = results.map(result => <Text>{result.title}</Text>)
+    console.log(results)
+  } else if (isError) {
+    // content = <div>{error.toString()}</div>
+    console.log(error)
+  }
+
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar
@@ -72,25 +89,7 @@ function App(): React.JSX.Element {
         contentInsetAdjustmentBehavior="automatic"
         style={backgroundStyle}>
         <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
+        {results?.map(result => <Text key={result?.id}>{result?.title}</Text>)}
       </ScrollView>
     </SafeAreaView>
   );
